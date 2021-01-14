@@ -1,8 +1,13 @@
 Este proyecto es una modificación de repositorio de gif-player https://github.com/CaptainCodeman/gif-player.
 
-## Para compilar el proyecto se debe:
+## Para realizar el build del proyecto se debe:
+
+npm run build
+
+## Para correrlo localmente se debe:
 
 npm run dev
+
 
 ## para modificar el proyecto se debe editar:
 
