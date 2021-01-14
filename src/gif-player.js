@@ -55,6 +55,7 @@ export default function() {
       this.resumePlaybackBound = this.resumePlayback.bind(this);
       this.prerenderFramesBound = this.prerenderFrames.bind(this);
       this.playLoopBound = this.playLoop.bind(this);
+      this.activate = this.activation.bind(this);
 
       const shadowRoot = this.attachShadow({mode: 'open'});
       shadowRoot.appendChild(document.importNode(template.content, true));
@@ -65,6 +66,7 @@ export default function() {
 
       this._lastFrame = 0;
       this._lastPosition = this.getBoundingClientRect().left; 
+      this._activate = false;
 
 
     }
@@ -78,10 +80,12 @@ export default function() {
       this.addEventListener('touchstart', this.pausePlaybackBound, false);
       this.addEventListener('touchmove', this.moveBound, false);
       this.addEventListener('touchend', this.resumePlaybackBound, false);
-
+      
       this.addEventListener('mouseenter', this.pausePlaybackBound, false);
       this.addEventListener('mousemove', this.moveBound, false);
       this.addEventListener('mouseleave', this.resumePlaybackBound, false);
+      this.addEventListener('mousedown', this.activation, false);
+      this.addEventListener('mouseup', this.activation, false);
     }
 
     disconnectedCallback() {
@@ -92,6 +96,9 @@ export default function() {
       this.removeEventListener('mouseenter', this.pausePlaybackBound, false);
       this.removeEventListener('mousemove', this.moveBound, false);
       this.removeEventListener('mouseleave', this.resumePlaybackBound, false);
+      this.removeEventListener('mousedown', this.activation, false);
+      this.removeEventListener('mouseup', this.activation, false);
+      this._activate = false;
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -156,37 +163,44 @@ export default function() {
     set onload(val) { this._onload = val; }
 
 
+    activation(){
+      this._activate = !this._activate;
+    }
+
     
     move(e) {
       e.preventDefault();
+      if(this._activate){
+        var clientX;
+        if (e.targetTouches) {
+          clientX = e.targetTouches[0].clientX;
+        } else {
+          clientX = e.clientX;
+        }
+  
+        // calculate our relative horizontal position over the element
+        // TODO: cache this, clear on scroll / resize etc...
+        var rect = this.getBoundingClientRect();
+        var x = clientX - rect.left;
+        var position = x / rect.width;
+        console.log('This._lastFrame', this._lastFrame);
+        console.log('This._lastPosition', this._lastPosition);
+        
+        if(position < this._lastPosition){
+          this.frame = this._lastFrame === 0 ? this._frames.length - 1 : this._lastFrame - 1;
+        }
+        else{
+          this.frame = this._lastFrame === this._frames.length - 1 ? 0 : this._lastFrame + 1;  
+        }
+        this._lastPosition = position;
+        this._lastFrame = this.frame;
+        console.log('This.frame', this.frame);
+        console.log('This.position', position);
+        // ... and which frame should appear there
+        //this.frame = Math.round((this._frames.length - 1) * position);
 
-      var clientX;
-      if (e.targetTouches) {
-        clientX = e.targetTouches[0].clientX;
-      } else {
-        clientX = e.clientX;
       }
 
-      // calculate our relative horizontal position over the element
-      // TODO: cache this, clear on scroll / resize etc...
-      var rect = this.getBoundingClientRect();
-      var x = clientX - rect.left;
-      var position = x / rect.width;
-      console.log('This._lastFrame', this._lastFrame);
-      console.log('This._lastPosition', this._lastPosition);
-      
-      if(position < this._lastPosition){
-        this.frame = this._lastFrame === 0 ? this._frames.length - 1 : this._lastFrame - 1;
-      }
-      else{
-        this.frame = this._lastFrame === this._frames.length - 1 ? 0 : this._lastFrame + 1;  
-      }
-      this._lastPosition = position;
-      this._lastFrame = this.frame;
-      console.log('This.frame', this.frame);
-      console.log('This.position', position);
-      // ... and which frame should appear there
-      //this.frame = Math.round((this._frames.length - 1) * position);
     }
 
     load(src) {
@@ -310,6 +324,7 @@ export default function() {
 
     resumePlayback(e) {
       this.paused = false;
+      this._activate = false;
       if (this.playing) {
         this.playAnimation(this._frames, this._frame);
       }
