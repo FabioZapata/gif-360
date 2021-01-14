@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>gif-player demos</title>
+
+    <script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="./dist/gif-360.es6.js" defer async></script>
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+        .centered {
+          max-width: 810px;
+        }
+
+        #examples {
+          overflow: auto;
+          margin: 0 -10px;
+        }
+
+        gif-player {
+          display: block;
+          margin: 10px;
+          border: 1px solid #ccc;
+          width: 240px;
+          height: 160px;
+        }
+      </style>
+    </custom-style>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+        <gif-player src="https://i2.wp.com/clipset.com/wp-content/uploads/2012/06/nyan-cat-gif.gif" speed="1"></gif-player>
+    </div>
+  </body>
+</html>
