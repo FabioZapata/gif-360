@@ -320,6 +320,8 @@ export default function() {
 
     pausePlayback(e) {
       this.paused = true;
+      this._activate = false;
+
     }
 
     resumePlayback(e) {
