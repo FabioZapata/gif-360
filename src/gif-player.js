@@ -62,13 +62,17 @@ export default function() {
       this._spinner = shadowRoot.querySelector('.spinner');
       this._canvas = shadowRoot.querySelector('canvas');
       this._ctx = this._canvas.getContext('2d');
+
+      this._lastFrame = 0;
+      this._lastPosition = this.getBoundingClientRect().left; 
+
+
     }
 
     connectedCallback() {
       this.style.display = 'inline-block';
       this.style.position = 'relative';
       this.style.overflow = 'hidden';
-      //this.style.cursor = 'url("../assets/mouse-left.png")';
       this.style.cursor = 'pointer';
 
       this.addEventListener('touchstart', this.pausePlaybackBound, false);
@@ -151,6 +155,8 @@ export default function() {
     get onload() { return this._onload; }
     set onload(val) { this._onload = val; }
 
+
+    
     move(e) {
       e.preventDefault();
 
@@ -166,9 +172,21 @@ export default function() {
       var rect = this.getBoundingClientRect();
       var x = clientX - rect.left;
       var position = x / rect.width;
-
+      console.log('This._lastFrame', this._lastFrame);
+      console.log('This._lastPosition', this._lastPosition);
+      
+      if(position < this._lastPosition){
+        this.frame = this._lastFrame === 0 ? this._frames.length - 1 : this._lastFrame - 1;
+      }
+      else{
+        this.frame = this._lastFrame === this._frames.length - 1 ? 0 : this._lastFrame + 1;  
+      }
+      this._lastPosition = position;
+      this._lastFrame = this.frame;
+      console.log('This.frame', this.frame);
+      console.log('This.position', position);
       // ... and which frame should appear there
-      this.frame = Math.round((this._frames.length - 1) * position);
+      //this.frame = Math.round((this._frames.length - 1) * position);
     }
 
     load(src) {
