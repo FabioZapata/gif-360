@@ -6,8 +6,8 @@ npm run build
 
 ## Para correrlo localmente se debe:
 
-npm install
-abrir el archivo index.html
+- npm install
+- abrir el archivo index.html
 
 
 ## para modificar el proyecto se debe editar:
